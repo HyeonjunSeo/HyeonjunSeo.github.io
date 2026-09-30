@@ -57,7 +57,7 @@ def ddf(x):
 def D_sq(x, x0, y0):
     return (x - x0)**2 + (f(x) - y0)**2
 
-x0 = 6
+x0 = -4
 y0 = 0
 shortest_distance, x, i, X = find_distance_newton(x0,y0,f,df,ddf)
 print(shortest_distance, x, i, X)
@@ -71,4 +71,5 @@ plt.scatter(X, D_sq(X, x0, y0), color='red')
 for i in range(len(X)):
     # plt.text(x_coordinate, y_coordinate, text_string)
     plt.text(X[i], D_sq(X, x0, y0)[i], i, fontsize=9)
+plt.savefig('fig')
 plt.show()
