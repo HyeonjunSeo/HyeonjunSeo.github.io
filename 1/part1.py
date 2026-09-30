@@ -44,7 +44,7 @@ def golden_section_search(x0, y0, f, a, b, ft, tolerance=1e-7):
             f_x1 = f_x2
             x2 = b - resphi * (b - a)
             f_x2 = dist_sq(x2)
-            best_x = (a + b) / 2
+        best_x = (a + b) / 2
         X = np.append(X, [[a, b]], axis = 0)
     return math.sqrt(dist_sq(best_x)), best_x, X
 
@@ -127,7 +127,6 @@ for ft in range(5):
             plt.text(X[j], D_sq(X, x0[i], y0[i], f,ft)[j], j, fontsize=9)
         plt.savefig("fig/" +str(ft) + str(i) + 'fig1')
         plt.close()
-
 
         shortest_distance, x, X = golden_section_search(x0[i],y0[i],f,a,b,ft)
         domain = np.arange(a, b+0.001, 0.001)

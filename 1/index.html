@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html>
 <head>
   <title>Assignment 1 - Distance Minimization</title>
@@ -6,10 +7,9 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 40px auto;
+      margin: 40px;
       max-width: 1000px;
       line-height: 1.6;
-      color: #222;
     }
 
     h1 {
@@ -17,59 +17,57 @@
     }
 
     h2 {
-      margin-top: 45px;
-      border-bottom: 2px solid #ddd;
-      padding-bottom: 8px;
+      margin-top: 40px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
     }
 
     h3 {
-      margin-top: 35px;
+      margin-top: 30px;
     }
 
     .back {
-      margin-bottom: 25px;
+      margin-bottom: 30px;
+    }
+
+    .method {
+      margin-top: 25px;
     }
 
     .equation {
       background: #f5f5f5;
       padding: 15px;
-      margin: 20px 0;
-      text-align: center;
+      margin: 15px 0;
       font-family: "Times New Roman", serif;
-      font-size: 20px;
-    }
-
-    .method {
-      background: #f8f8f8;
-      padding: 15px 20px;
-      margin: 20px 0;
-      border-left: 4px solid #777;
+      font-size: 18px;
+      text-align: center;
     }
 
     .warning {
-      background: #fff7e6;
-      padding: 15px 20px;
+      background: #fff3cd;
+      border-left: 5px solid #ffc107;
+      padding: 15px;
       margin: 20px 0;
-      border-left: 4px solid #e6a23c;
     }
 
     .figure {
       margin: 30px 0;
-      text-align: center;
     }
 
     .figure img {
-      width: 100%;
-      max-width: 900px;
-      border: 1px solid #ddd;
-      border-radius: 5px;
+      max-width: 100%;
+      height: auto;
+      display: block;
+      margin-top: 10px;
     }
 
-    .caption {
-      color: #555;
-      font-size: 0.95em;
+    .comparison {
+      background: #f5f5f5;
+      padding: 20px;
+      margin-top: 20px;
     }
   </style>
+
 </head>
 
 <body>
@@ -81,20 +79,25 @@
   <h1>Assignment 1 — Distance Minimization</h1>
 
   <p>
-    This assignment investigates numerical methods for finding the
-    shortest distance between a point and a nonlinear function.
-    Two methods were implemented:
-    <strong>Newton-Raphson</strong> and
-    <strong>Golden-Section Search</strong>.
+    This assignment investigates the shortest distance between a point
+    <strong>(x₀, y₀)</strong> and a nonlinear function <strong>f(x)</strong>.
+    Two numerical optimization methods are used:
+    <strong>Newton-Raphson</strong> and <strong>Golden-Section Search</strong>.
   </p>
-
 
   <h2>Problem Formulation</h2>
 
   <p>
-    Given a point <strong>(x₀, y₀)</strong> and a function
-    <strong>f(x)</strong>, the squared distance between the point and
-    a point on the function is
+    For a point (x₀, y₀) and a function f(x), a point on the function
+    can be written as:
+  </p>
+
+  <div class="equation">
+    (x, f(x))
+  </div>
+
+  <p>
+    The squared Euclidean distance between these two points is:
   </p>
 
   <div class="equation">
@@ -102,204 +105,218 @@
   </div>
 
   <p>
-    The squared distance is minimized instead of the actual distance
-    because taking the square root does not change the location of
-    the minimum.
+    Minimizing the squared distance is equivalent to minimizing the actual
+    distance because the square root is a monotonically increasing function.
+    Therefore, the optimization problem can be solved by finding the value
+    of <strong>x</strong> that minimizes D²(x).
   </p>
-
 
   <h2>Newton-Raphson Method</h2>
 
-  <div class="method">
+  <p>
+    Newton-Raphson finds a stationary point of the squared-distance function
+    by using its first and second derivatives.
+  </p>
 
-    <p>
-      Newton-Raphson uses the first and second derivatives of the
-      squared-distance function to iteratively find a stationary point.
-    </p>
-
-    <div class="equation">
-      x<sub>n+1</sub> =
-      x<sub>n</sub> −
-      D²′(x<sub>n</sub>) / D²″(x<sub>n</sub>)
-    </div>
-
-    <p>
-      The red points in the figures represent the successive
-      Newton-Raphson iterations.
-    </p>
-
+  <div class="equation">
+    x<sub>n+1</sub> =
+    x<sub>n</sub> −
+    D²'(x<sub>n</sub>) / D²''(x<sub>n</sub>)
   </div>
 
+  <p>
+    The algorithm starts from an initial guess and repeatedly updates x using
+    the equation above. The process stops when the change in x or the change
+    in the objective function becomes sufficiently small.
+  </p>
+
+  <p>
+    Newton-Raphson is a <strong>local optimization method</strong>. This means
+    that its result can depend on the initial guess. Importantly, solving
+    D²'(x) = 0 only tells us that a stationary point has been found; that
+    stationary point can be either a minimum or a maximum.
+  </p>
+
+  <div class="equation">
+    D²''(x) &gt; 0 → local minimum
+    <br>
+    D²''(x) &lt; 0 → local maximum
+  </div>
+
+  <h2>Golden-Section Search</h2>
+
+  <p>
+    Golden-Section Search is a <strong>derivative-free optimization method</strong>
+    used to find the minimum of a function within a bounded interval.
+    In this assignment, the function being minimized is:
+  </p>
+
+  <div class="equation">
+    D²(x) = (x − x₀)² + (f(x) − y₀)²
+  </div>
+
+  <p>
+    The method begins with an interval <strong>[a, b]</strong> that contains
+    the minimum. Two points inside the interval are selected using the
+    golden ratio:
+  </p>
+
+  <div class="equation">
+    r = (√5 − 1) / 2 ≈ 0.618
+  </div>
+
+  <div class="equation">
+    x₁ = b − r(b − a)
+    <br><br>
+    x₂ = a + r(b − a)
+  </div>
+
+  <p>
+    The squared distance is evaluated at both points. The two values are
+    compared to determine which part of the interval can be discarded.
+  </p>
+
+  <ul>
+    <li>
+      If D²(x₁) &lt; D²(x₂), the minimum is kept in
+      <strong>[a, x₂]</strong>.
+    </li>
+    <li>
+      If D²(x₁) &gt; D²(x₂), the minimum is kept in
+      <strong>[x₁, b]</strong>.
+    </li>
+  </ul>
+
+  <p>
+    This process is repeated, progressively reducing the size of the
+    interval. The algorithm stops when the interval becomes smaller than
+    the specified tolerance.
+  </p>
+
+  <h3>Why use Golden-Section Search?</h3>
+
+  <p>
+    Unlike Newton-Raphson, Golden-Section Search does not require the first
+    or second derivative of the function. It only requires evaluations of
+    the function itself.
+  </p>
+
+  <p>
+    This makes it useful when derivatives are difficult to calculate or when
+    Newton-Raphson is sensitive to its initial guess. Because Golden-Section
+    Search operates within a bounded interval, it provides a systematic way
+    of narrowing the search toward a minimum.
+  </p>
+
+  <h2>Examples</h2>
 
   <h3>Example 01</h3>
 
   <div class="figure">
-    <img src="./fig/01fig1.png"
-         alt="Newton-Raphson result for example 01">
-
-    <p class="caption">
-      <strong>Figure 1.</strong>
-      Newton-Raphson iterations for example 01.
-    </p>
+    <h4>Newton-Raphson</h4>
+    <img src="./fig/01fig1.png" alt="Example 01 Newton-Raphson">
   </div>
 
   <div class="figure">
-    <img src="./fig/01fig2.png"
-         alt="Golden-section result for example 01">
-
-    <p class="caption">
-      <strong>Figure 2.</strong>
-      Golden-section search for example 01.
-    </p>
+    <h4>Golden-Section Search</h4>
+    <img src="./fig/01fig2.png" alt="Example 01 Golden-Section Search">
   </div>
-
 
   <h3>Example 17</h3>
 
   <div class="figure">
-    <img src="./fig/17fig1.png"
-         alt="Newton-Raphson result for example 17">
-
-    <p class="caption">
-      <strong>Figure 3.</strong>
-      Newton-Raphson iterations for example 17.
-    </p>
+    <h4>Newton-Raphson</h4>
+    <img src="./fig/17fig1.png" alt="Example 17 Newton-Raphson">
   </div>
 
   <div class="figure">
-    <img src="./fig/17fig2.png"
-         alt="Golden-section result for example 17">
-
-    <p class="caption">
-      <strong>Figure 4.</strong>
-      Golden-section search for example 17.
-    </p>
+    <h4>Golden-Section Search</h4>
+    <img src="./fig/17fig2.png" alt="Example 17 Golden-Section Search">
   </div>
-
 
   <h3>Example 28</h3>
 
   <div class="figure">
-    <img src="./fig/28fig1.png"
-         alt="Newton-Raphson result for example 28">
-
-    <p class="caption">
-      <strong>Figure 5.</strong>
-      Newton-Raphson iterations for example 28.
-    </p>
+    <h4>Newton-Raphson</h4>
+    <img src="./fig/28fig1.png" alt="Example 28 Newton-Raphson">
   </div>
 
   <div class="figure">
-    <img src="./fig/28fig2.png"
-         alt="Golden-section result for example 28">
-
-    <p class="caption">
-      <strong>Figure 6.</strong>
-      Golden-section search for example 28.
-    </p>
+    <h4>Golden-Section Search</h4>
+    <img src="./fig/28fig2.png" alt="Example 28 Golden-Section Search">
   </div>
 
-
-  <h3>Example 35 — Local Maximum</h3>
+  <h3>Example 35</h3>
 
   <div class="figure">
-    <img src="./fig/35fig1.png"
-         alt="Newton-Raphson converging to a local maximum">
-
-    <p class="caption">
-      <strong>Figure 7.</strong>
-      Newton-Raphson iterations for example 35.
-    </p>
+    <h4>Newton-Raphson</h4>
+    <img src="./fig/35fig1.png" alt="Example 35 Newton-Raphson">
   </div>
 
   <div class="warning">
-
-    <h3>Why does Newton-Raphson stop at a local maximum?</h3>
-
-    <p>
-      Newton-Raphson searches for a point where the derivative of the
-      objective function is zero. However, a zero derivative only
-      identifies a stationary point. It does not guarantee that the
-      point is a minimum.
-    </p>
-
-    <p>
-      In this example, the iterations converge to a stationary point
-      that corresponds to a local maximum of the squared-distance
-      function. This occurs because Newton-Raphson is a local method,
-      so its result depends on the initial guess and the local shape
-      of the objective function.
-    </p>
-
-    <p>
-      The second derivative can be used to classify the stationary point:
-    </p>
-
-    <div class="equation">
-      D²″(x) &gt; 0 → local minimum
-      <br>
-      D²″(x) &lt; 0 → local maximum
-    </div>
-
-    <p>
-      To continue searching for the desired minimum, Newton-Raphson
-      can be restarted with a different initial guess. Another option
-      is to use Golden-Section Search over the specified interval.
-      The resulting squared distances can then be compared to identify
-      the minimum-distance solution.
-    </p>
-
+    <strong>Newton-Raphson local maximum:</strong>
+    Newton-Raphson solves for a stationary point where D²'(x) = 0.
+    However, a stationary point can be either a local minimum or a local
+    maximum. In this example, Newton-Raphson converges to a local maximum
+    rather than the desired minimum.
+    The second derivative can be used to classify the stationary point:
+    D²''(x) &gt; 0 indicates a local minimum, while D²''(x) &lt; 0 indicates
+    a local maximum.
+    Since Newton-Raphson is a local method, a different initial guess can
+    be used to search for another stationary point. Golden-Section Search
+    can also be used over a bounded interval to search for the minimum.
   </div>
 
   <div class="figure">
-    <img src="./fig/35fig2.png"
-         alt="Golden-section result for example 35">
-
-    <p class="caption">
-      <strong>Figure 8.</strong>
-      Golden-section search for example 35.
-    </p>
+    <h4>Golden-Section Search</h4>
+    <img src="./fig/35fig2.png" alt="Example 35 Golden-Section Search">
   </div>
-
 
   <h3>Example 47</h3>
 
   <div class="figure">
-    <img src="./fig/47fig1.png"
-         alt="Newton-Raphson result for example 47">
-
-    <p class="caption">
-      <strong>Figure 9.</strong>
-      Newton-Raphson iterations for example 47.
-    </p>
+    <h4>Newton-Raphson</h4>
+    <img src="./fig/47fig1.png" alt="Example 47 Newton-Raphson">
   </div>
 
   <div class="figure">
-    <img src="./fig/47fig2.png"
-         alt="Golden-section result for example 47">
-
-    <p class="caption">
-      <strong>Figure 10.</strong>
-      Golden-section search for example 47.
-    </p>
+    <h4>Golden-Section Search</h4>
+    <img src="./fig/47fig2.png" alt="Example 47 Golden-Section Search">
   </div>
-
 
   <h2>Comparison of the Methods</h2>
 
-  <p>
-    Newton-Raphson uses derivative information and updates a single
-    estimate of the solution. It can converge quickly, but its result
-    depends on the initial guess and it can converge to an undesired
-    stationary point.
-  </p>
+  <div class="comparison">
 
-  <p>
-    Golden-Section Search does not require derivatives. Instead, it
-    repeatedly reduces an interval containing the minimum. This makes
-    it useful when derivatives are unavailable or when a bounded
-    search interval is known.
-  </p>
+```
+<h3>Newton-Raphson</h3>
+
+<ul>
+  <li>Uses the first and second derivatives.</li>
+  <li>Can converge very quickly when the initial guess is appropriate.</li>
+  <li>Is a local method and depends on the initial guess.</li>
+  <li>Can converge to a local maximum or another stationary point.</li>
+</ul>
+
+<h3>Golden-Section Search</h3>
+
+<ul>
+  <li>Does not require derivatives.</li>
+  <li>Only requires evaluations of the objective function.</li>
+  <li>Searches within a bounded interval.</li>
+  <li>Systematically reduces the search interval.</li>
+  <li>Generally requires more iterations than Newton-Raphson.</li>
+</ul>
+
+<p>
+  Therefore, the two methods approach the same distance-minimization
+  problem differently. Newton-Raphson uses local derivative information
+  to move toward a stationary point, while Golden-Section Search uses
+  function values to progressively reduce a bounded search interval.
+</p>
+```
+
+  </div>
 
 </body>
 </html>
