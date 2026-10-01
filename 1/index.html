@@ -85,204 +85,163 @@
     <strong>Newton-Raphson</strong> and <strong>Golden-Section Search</strong>.
   </p>
 
-  <h2>Problem Formulation</h2>
+  <!-- ========================= -->
 
-  <p>
-    For a point (x₀, y₀) and a function f(x), a point on the function
-    can be written as:
-  </p>
+  <!-- NEWTON-RAPHSON -->
 
-  <div class="equation">
-    (x, f(x))
-  </div>
-
-  <p>
-    The squared Euclidean distance between these two points is:
-  </p>
-
-  <div class="equation">
-    D²(x) = (x − x₀)² + (f(x) − y₀)²
-  </div>
-
-  <p>
-    Minimizing the squared distance is equivalent to minimizing the actual
-    distance because the square root is a monotonically increasing function.
-    Therefore, the optimization problem can be solved by finding the value
-    of <strong>x</strong> that minimizes D²(x).
-  </p>
+  <!-- ========================= -->
 
   <h2>Newton-Raphson Method</h2>
 
   <p>
-    Newton-Raphson finds a stationary point of the squared-distance function
-    by using its first and second derivatives.
+    Newton-Raphson is a numerical optimization method that uses the first and
+    second derivatives of an objective function to find a stationary point.
+    In this assignment, it is used to minimize the distance between a point
+    and a function.
+  </p>
+
+  <h3>Distance Function</h3>
+
+  <p>
+    For a point <strong>(x₀, y₀)</strong> and a function <strong>f(x)</strong>,
+    the squared distance is:
   </p>
 
   <div class="equation">
-    x<sub>n+1</sub> =
-    x<sub>n</sub> −
-    D²'(x<sub>n</sub>) / D²''(x<sub>n</sub>)
+    D(x) = (x − x₀)² + (f(x) − y₀)²
   </div>
 
   <p>
-    The algorithm starts from an initial guess and repeatedly updates x using
-    the equation above. The process stops when the change in x or the change
-    in the objective function becomes sufficiently small.
+    Minimizing the squared distance gives the same location as minimizing the
+    actual Euclidean distance, while avoiding the square root during
+    optimization.
   </p>
 
+  <h3>Newton Update</h3>
+
   <p>
-    Newton-Raphson is a <strong>local optimization method</strong>. This means
-    that its result can depend on the initial guess. Importantly, solving
-    D²'(x) = 0 only tells us that a stationary point has been found; that
-    stationary point can be either a minimum or a maximum.
+    Newton's method finds a stationary point by solving:
   </p>
 
   <div class="equation">
-    D²''(x) &gt; 0 → local minimum
-    <br>
-    D²''(x) &lt; 0 → local maximum
+    D'(x) = 0
   </div>
+
+  <p>
+    Starting from an initial guess <strong>x₀</strong>, the Newton update is:
+  </p>
+
+  <div class="equation">
+    x<sub>k+1</sub> =
+    x<sub>k</sub> −
+    D'(x<sub>k</sub>) / D''(x<sub>k</sub>)
+  </div>
+
+  <p>
+    The process is repeated until the change between successive estimates is
+    smaller than the specified tolerance.
+  </p>
+
+  <h3>Example Results</h3>
+
+  <div class="figure">
+    <h4>Example 01</h4>
+    <img src="./fig/01fig1.png" alt="Newton-Raphson result for example 01">
+  </div>
+
+  <div class="figure">
+    <h4>Example 17</h4>
+    <img src="./fig/17fig1.png" alt="Newton-Raphson result for example 17">
+  </div>
+
+  <div class="figure">
+    <h4>Example 28</h4>
+    <img src="./fig/28fig1.png" alt="Newton-Raphson result for example 28">
+  </div>
+
+  <div class="figure">
+    <h4>Example 35</h4>
+    <img src="./fig/35fig1.png" alt="Newton-Raphson result for example 35">
+  </div>
+
+  <div class="figure">
+    <h4>Example 47</h4>
+    <img src="./fig/47fig1.png" alt="Newton-Raphson result for example 47">
+  </div>
+
+  <!-- ========================= -->
+
+  <!-- GOLDEN SECTION -->
+
+  <!-- ========================= -->
 
   <h2>Golden-Section Search</h2>
 
   <p>
-    Golden-Section Search is a <strong>derivative-free optimization method</strong>
-    used to find the minimum of a function within a bounded interval.
-    In this assignment, the function being minimized is:
+    Golden-Section Search is a derivative-free optimization method. Instead of
+    using derivatives, it evaluates the objective function at points inside
+    a bounded interval and progressively reduces that interval.
+  </p>
+
+  <h3>Golden Ratio</h3>
+
+  <p>
+    The method uses the golden ratio to determine the locations of the
+    interior points:
   </p>
 
   <div class="equation">
-    D²(x) = (x − x₀)² + (f(x) − y₀)²
+    φ = (1 + √5) / 2
   </div>
 
   <p>
-    The method begins with an interval <strong>[a, b]</strong> that contains
-    the minimum. Two points inside the interval are selected using the
-    golden ratio:
+    At each iteration, the algorithm compares the objective function values
+    at the two interior points. The portion of the interval that cannot
+    contain the minimum is discarded.
   </p>
 
-  <div class="equation">
-    r = (√5 − 1) / 2 ≈ 0.618
-  </div>
+  <h3>Search Procedure</h3>
 
-  <div class="equation">
-    x₁ = b − r(b − a)
-    <br><br>
-    x₂ = a + r(b − a)
-  </div>
+  <ol>
+    <li>Start with a lower and upper bound.</li>
+    <li>Calculate two interior points using the golden ratio.</li>
+    <li>Evaluate the objective function at both points.</li>
+    <li>Discard the portion containing the larger function value.</li>
+    <li>Repeat until the interval is sufficiently small.</li>
+  </ol>
 
-  <p>
-    The squared distance is evaluated at both points. The two values are
-    compared to determine which part of the interval can be discarded.
-  </p>
-
-  <ul>
-    <li>
-      If D²(x₁) &lt; D²(x₂), the minimum is kept in
-      <strong>[a, x₂]</strong>.
-    </li>
-    <li>
-      If D²(x₁) &gt; D²(x₂), the minimum is kept in
-      <strong>[x₁, b]</strong>.
-    </li>
-  </ul>
-
-  <p>
-    This process is repeated, progressively reducing the size of the
-    interval. The algorithm stops when the interval becomes smaller than
-    the specified tolerance.
-  </p>
-
-  <h3>Why use Golden-Section Search?</h3>
-
-  <p>
-    Unlike Newton-Raphson, Golden-Section Search does not require the first
-    or second derivative of the function. It only requires evaluations of
-    the function itself.
-  </p>
-
-  <p>
-    This makes it useful when derivatives are difficult to calculate or when
-    Newton-Raphson is sensitive to its initial guess. Because Golden-Section
-    Search operates within a bounded interval, it provides a systematic way
-    of narrowing the search toward a minimum.
-  </p>
-
-  <h2>Examples</h2>
-
-  <h3>Example 01</h3>
+  <h3>Example Results</h3>
 
   <div class="figure">
-    <h4>Newton-Raphson</h4>
-    <img src="./fig/01fig1.png" alt="Example 01 Newton-Raphson">
+    <h4>Example 01</h4>
+    <img src="./fig/01fig2.png" alt="Golden-section result for example 01">
   </div>
 
   <div class="figure">
-    <h4>Golden-Section Search</h4>
-    <img src="./fig/01fig2.png" alt="Example 01 Golden-Section Search">
-  </div>
-
-  <h3>Example 17</h3>
-
-  <div class="figure">
-    <h4>Newton-Raphson</h4>
-    <img src="./fig/17fig1.png" alt="Example 17 Newton-Raphson">
+    <h4>Example 17</h4>
+    <img src="./fig/17fig2.png" alt="Golden-section result for example 17">
   </div>
 
   <div class="figure">
-    <h4>Golden-Section Search</h4>
-    <img src="./fig/17fig2.png" alt="Example 17 Golden-Section Search">
-  </div>
-
-  <h3>Example 28</h3>
-
-  <div class="figure">
-    <h4>Newton-Raphson</h4>
-    <img src="./fig/28fig1.png" alt="Example 28 Newton-Raphson">
+    <h4>Example 28</h4>
+    <img src="./fig/28fig2.png" alt="Golden-section result for example 28">
   </div>
 
   <div class="figure">
-    <h4>Golden-Section Search</h4>
-    <img src="./fig/28fig2.png" alt="Example 28 Golden-Section Search">
-  </div>
-
-  <h3>Example 35</h3>
-
-  <div class="figure">
-    <h4>Newton-Raphson</h4>
-    <img src="./fig/35fig1.png" alt="Example 35 Newton-Raphson">
-  </div>
-
-  <div class="warning">
-    <strong>Newton-Raphson local maximum:</strong>
-    Newton-Raphson solves for a stationary point where D²'(x) = 0.
-    However, a stationary point can be either a local minimum or a local
-    maximum. In this example, Newton-Raphson converges to a local maximum
-    rather than the desired minimum.
-    The second derivative can be used to classify the stationary point:
-    D²''(x) &gt; 0 indicates a local minimum, while D²''(x) &lt; 0 indicates
-    a local maximum.
-    Since Newton-Raphson is a local method, a different initial guess can
-    be used to search for another stationary point. Golden-Section Search
-    can also be used over a bounded interval to search for the minimum.
+    <h4>Example 35</h4>
+    <img src="./fig/35fig2.png" alt="Golden-section result for example 35">
   </div>
 
   <div class="figure">
-    <h4>Golden-Section Search</h4>
-    <img src="./fig/35fig2.png" alt="Example 35 Golden-Section Search">
+    <h4>Example 47</h4>
+    <img src="./fig/47fig2.png" alt="Golden-section result for example 47">
   </div>
 
-  <h3>Example 47</h3>
+  <!-- ========================= -->
 
-  <div class="figure">
-    <h4>Newton-Raphson</h4>
-    <img src="./fig/47fig1.png" alt="Example 47 Newton-Raphson">
-  </div>
+  <!-- COMPARISON -->
 
-  <div class="figure">
-    <h4>Golden-Section Search</h4>
-    <img src="./fig/47fig2.png" alt="Example 47 Golden-Section Search">
-  </div>
+  <!-- ========================= -->
 
   <h2>Comparison of the Methods</h2>
 
@@ -317,6 +276,147 @@
 ```
 
   </div>
+
+  <!-- ========================= -->
+
+  <!-- LINE AND PARABOLA FITTING -->
+
+  <!-- ========================= -->
+
+  <h2>Fitting a Line and Parabola Using Newton's Method</h2>
+
+  <p>
+    The second part of the assignment fits a line and a parabola to a set of
+    data points by minimizing the mean squared error (MSE).
+  </p>
+
+  <h3>Data</h3>
+
+  <p>
+    The data points used for the fitting problem are:
+  </p>
+
+  <div class="equation">
+    (0, 0.5), &nbsp;
+    (2, 3.5), &nbsp;
+    (1, 1.5), &nbsp;
+    (3, 7.5)
+  </div>
+
+  <h3>Mean Squared Error</h3>
+
+  <p>
+    For a model prediction <strong>ŷ</strong>, the mean squared error is
+    defined as:
+  </p>
+
+  <div class="equation">
+    MSE =
+    (1/n) Σ (y<sub>i</sub> − ŷ<sub>i</sub>)²
+  </div>
+
+  <p>
+    The objective is to find the model parameters that minimize this error.
+  </p>
+
+  <!-- LINE FITTING -->
+
+  <h3>Line Fitting</h3>
+
+  <p>
+    The line is represented by:
+  </p>
+
+  <div class="equation">
+    ŷ = ax + b
+  </div>
+
+  <p>
+    The MSE is minimized with respect to the two parameters,
+    <strong>a</strong> and <strong>b</strong>. Newton's method uses the
+    gradient and second derivative to update each parameter.
+  </p>
+
+  <div class="equation">
+    a ← a −
+    (∂MSE/∂a) /
+    (∂²MSE/∂a²)
+  </div>
+
+  <div class="equation">
+    b ← b −
+    (∂MSE/∂b) /
+    (∂²MSE/∂b²)
+  </div>
+
+  <p>
+    The parameters are updated one at a time. First <strong>a</strong> is
+    updated, then <strong>b</strong> is updated using the newly updated value
+    of <strong>a</strong>. This process is repeated for several iterations.
+  </p>
+
+  <!-- PARABOLA FITTING -->
+
+  <h3>Parabola Fitting</h3>
+
+  <p>
+    The parabola is represented by:
+  </p>
+
+  <div class="equation">
+    ŷ = ax² + bx + c
+  </div>
+
+  <p>
+    The three parameters are updated sequentially using their corresponding
+    scalar gradients and second derivatives:
+  </p>
+
+  <div class="equation">
+    a ← a −
+    (∂MSE/∂a) /
+    (∂²MSE/∂a²)
+    <br><br>
+
+```
+b ← b −
+(∂MSE/∂b) /
+(∂²MSE/∂b²)
+<br><br>
+
+c ← c −
+(∂MSE/∂c) /
+(∂²MSE/∂c²)
+```
+
+  </div>
+
+  <p>
+    Similar to the line fitting procedure, the parameters are updated one at
+    a time. The update of each parameter uses the most recently updated
+    values of the other parameters.
+  </p>
+
+  <!-- FITTING RESULT -->
+
+  <h3>Fitting Result</h3>
+
+  <p>
+    The resulting line and parabola are shown together with the original
+    data points below.
+  </p>
+
+  <div class="figure">
+    <img
+      src="./fig/part2.png"
+      alt="Line and parabola fitting using Newton's Method">
+  </div>
+
+  <p>
+    The plot shows how both models fit the same set of data points. The
+    parameters are obtained by iteratively minimizing the MSE using
+    one-parameter-at-a-time Newton updates.
+  </p>
 
 </body>
 </html>
