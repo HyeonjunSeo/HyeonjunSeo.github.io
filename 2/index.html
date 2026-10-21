@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SYDE572 Assignment 2</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px auto;
+      padding: 0 20px;
+      max-width: 1000px;
+      line-height: 1.6;
+      color: #222;
+    }
+
+    h1 { margin-bottom: 5px; }
+    h2 { margin-top: 34px; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+    h3 { margin-top: 24px; margin-bottom: 8px; }
+    .subtitle { color: #555; margin-top: 0; }
+    figure { margin: 18px 0 28px; }
+    figure img { display: block; max-width: 100%; height: auto; border: 1px solid #ddd; }
+    figcaption { color: #555; font-size: 0.92em; margin-top: 6px; }
+    .comment { margin: 12px 0 24px; }
+    .back { display: inline-block; margin-bottom: 18px; }
+    code { overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <a class="back" href="../index.html">&larr; Back to portfolio</a>
+  <h1>SYDE572 — Assignment 2</h1>
+  <p class="subtitle">Polynomial regression and Gaussian basis function regression</p>
+
+  <h2>Part 1: Polynomial Regression</h2>
+
+  <h3>(a) Training and testing RMS versus polynomial degree</h3>
+  <figure>
+    <img src="./fig/part1a_rms_errors.png" alt="Training and testing RMS versus polynomial degree">
+    <figcaption>Training and testing RMS for polynomial degrees 1 through 7.</figcaption>
+  </figure>
+  <p class="comment"><strong>Comment:</strong> Training RMS generally decreases as polynomial degree increases at first. However, the testing RMS becomes extremely large and fluctuates substantially. This indicates poor generalization at higher degrees and may also indicate numerical instability because raw feature values are raised to high powers.</p>
+
+  <h3>(b) Linear regression weights</h3>
+  <p>The fitted degree-1 model produced the following weights, with the bias first:</p>
+  <p><code>[-37.9042, -3.4559, 0.005382, -0.168779, approximately 0, 21.5154, 8.5910, -0.079237, 0.007627, -0.139906, -0.007630, 0.154556, 0.006645, 0.026230]</code></p>
+  <ul>
+    <li>Bias weight: <strong>-37.9042</strong></li>
+    <li>Weight on the 6th feature (RM): <strong>8.5910</strong></li>
+    <li>Weight on the 8th feature (DIS): <strong>0.007627</strong></li>
+  </ul>
+
+  <h3>(c) Polynomial regression using INDUS</h3>
+  <p>The following figures show the fitted polynomial and the training and testing points for the degrees evaluated. The images are expected to be in the existing <code>fig</code> folder.</p>
+  <figure>
+    <img src="./fig/polynomial_regression_degree_1.png" alt="Degree 1 polynomial regression using INDUS">
+    <figcaption>Degree 1.</figcaption>
+  </figure>
+  <figure>
+    <img src="./fig/polynomial_regression_degree_3.png" alt="Degree 3 polynomial regression using INDUS">
+    <figcaption>Degree 3.</figcaption>
+  </figure>
+  <figure>
+    <img src="./fig/polynomial_regression_degree_7.png" alt="Degree 7 polynomial regression using INDUS">
+    <figcaption>Degree 7.</figcaption>
+  </figure>
+  <p class="comment"><strong>Comment:</strong> The fitted curve becomes more flexible as the polynomial degree increases. Higher-degree curves can fit the training points more closely, but may fluctuate more and generalize less reliably to unseen data.</p>
+
+  <h3>(d) Selecting the regularization constant</h3>
+  <figure>
+    <img src="./fig/part1d_regularization_cv.png" alt="Cross-validation error versus regularization constant for polynomial regression">
+    <figcaption>Average validation RMS from 10-fold cross-validation. The value for λ = 0 is displayed separately because zero cannot be placed on a logarithmic x-axis.</figcaption>
+  </figure>
+  <p class="comment"><strong>Comment:</strong> The lowest average validation RMS was <strong>9.9839</strong>, at <strong>λ = 10</strong>. Therefore, λ = 10 is selected for the degree-8 polynomial model based on these cross-validation results. The very large unregularized error suggests the model is unstable without regularization.</p>
+
+  <h2>Part 2: Gaussian Basis Function Regression</h2>
+
+  <h3>(e) Training and testing RMS versus number of basis functions</h3>
+  <figure>
+    <img src="./fig/part2e_gaussian_errors.png" alt="Training and testing RMS versus number of Gaussian basis functions">
+    <figcaption>Training and testing RMS for 5, 15, 25, ..., 95 Gaussian basis functions.</figcaption>
+  </figure>
+  <p class="comment"><strong>Comment:</strong> Training RMS decreases from <strong>21.5121</strong> with 5 basis functions to <strong>3.2385</strong> with 95 basis functions. Testing RMS decreases only slightly, from <strong>24.4771</strong> to <strong>23.3589</strong>. Thus, adding basis functions improves the fit to the training data, while test performance improves only modestly.</p>
+
+  <h3>(f) Selecting the regularization constant</h3>
+  <figure>
+    <img src="./fig/part2f_gaussian_regularization.png" alt="Cross-validation error versus regularization constant for Gaussian basis regression">
+    <figcaption>Average validation RMS for 90 Gaussian basis functions using 10-fold cross-validation. The λ = 0 value is annotated separately.</figcaption>
+  </figure>
+  <p class="comment"><strong>Comment:</strong> The lowest average validation RMS was <strong>10.7364</strong>, at <strong>λ = 0</strong>. Therefore, cross-validation selects the unregularized model for this configuration. In this experiment, increasing the regularization constant increased validation error.</p>
+
+  <p><a href="../index.html">Back to portfolio</a></p>
+</body>
+</html>
