@@ -48,6 +48,9 @@
     <li>Weight on the 6th feature (RM): <strong>8.5910</strong></li>
     <li>Weight on the 8th feature (DIS): <strong>0.007627</strong></li>
   </ul>
+  <p class="comment"><strong>Are the weights reasonable?</strong> The weight for RM (average number of rooms per dwelling) is positive ((w_5 = 8.5910)), which seems reasonable because houses with more rooms would generally be expected to have higher median values.
+
+The weight for DIS (weighted distance to five Boston employment centres) is very close to zero ((w_7 = 0.007627)), suggesting that this feature has little linear influence on the predicted median house value in this fitted model. This also seems reasonable if distance to employment centres is assumed to have little direct influence compared with other housing characteristics. However, a near-zero weight does not necessarily mean that distance is unimportant; its effect may be captured by other features or may not be well represented by a linear relationship.</p>
 
   <h3>(c) Polynomial regression using INDUS</h3>
   <p>The following figures show the fitted polynomial and the training and testing points for the degrees evaluated. The images are expected to be in the existing <code>fig</code> folder.</p>

@@ -54,7 +54,7 @@ for degree in degrees:
     train_rms, test_rms = polynomial_regression(
         X_train, y_train, X_test, degree
     )
-
+    print(degree)
     train_errors.append(train_rms)
     test_errors.append(test_rms)
 
