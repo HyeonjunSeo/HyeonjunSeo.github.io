@@ -38,19 +38,18 @@
     <img src="./fig/part1a_rms_errors.png" alt="Training and testing RMS versus polynomial degree">
     <figcaption>Training and testing RMS for polynomial degrees 1 through 7.</figcaption>
   </figure>
-  <p class="comment"><strong>Comment:</strong> Training RMS generally decreases as polynomial degree increases at first. However, the testing RMS becomes extremely large and fluctuates substantially. This indicates poor generalization at higher degrees and may also indicate numerical instability because raw feature values are raised to high powers.</p>
+  <p class="comment"><strong>Comment:</strong> Training RMS decreases as polynomial degree increases, from 2.0372 for degree 1 to 0.8815 for degree 7. In contrast, testing RMS increases dramatically, from 36.4449 for degree 1 to approximately 2.11 × 10²⁷ for degree 7. This indicates severe overfitting and poor generalization at higher degrees. The extremely large testing errors also suggest numerical instability caused by raising unnormalized feature values to high powers.</p>
 
   <h3>(b) Linear regression weights</h3>
   <p>The fitted degree-1 model produced the following weights, with the bias first:</p>
-  <p><code>[-37.9042, -3.4559, 0.005382, -0.168779, approximately 0, 21.5154, 8.5910, -0.079237, 0.007627, -0.139906, -0.007630, 0.154556, 0.006645, 0.026230]</code></p>
+  <p><code>[22.3090, -1.337974, 0.122993, -0.531065, approximately 0, 1.002651, 4.195634, -2.166275, 0.010715, -0.193778, -0.348631, 0.261264, 0.181073, 0.148761]</code></p>
   <ul>
-    <li>Bias weight: <strong>-37.9042</strong></li>
-    <li>Weight on the 6th feature (RM): <strong>8.5910</strong></li>
-    <li>Weight on the 8th feature (DIS): <strong>0.007627</strong></li>
+    <li>Bias weight: <strong>22.3090</strong></li>
+    <li>Weight on the 6th feature (RM): <strong>4.1956</strong></li>
+    <li>Weight on the 8th feature (DIS): <strong>0.010715</strong></li>
   </ul>
-  <p class="comment"><strong>Are the weights reasonable?</strong> The weight for RM (average number of rooms per dwelling) is positive ((w_5 = 8.5910)), which seems reasonable because houses with more rooms would generally be expected to have higher median values.
-
-The weight for DIS (weighted distance to five Boston employment centres) is very close to zero ((w_7 = 0.007627)), suggesting that this feature has little linear influence on the predicted median house value in this fitted model. This also seems reasonable if distance to employment centres is assumed to have little direct influence compared with other housing characteristics. However, a near-zero weight does not necessarily mean that distance is unimportant; its effect may be captured by other features or may not be well represented by a linear relationship.</p>
+  <p class="comment"><strong>Are the weights reasonable?</strong> The weight for RM (average number of rooms per dwelling) is positive (w₅ = 4.1956), which is reasonable because houses with more rooms would generally be expected to have higher median values, holding other features constant.</p>
+  <p class="comment">The weight for DIS (weighted distance to five Boston employment centres) is relatively close to zero (w₇ = 0.010715), suggesting a small linear contribution in this fitted model. However, a small coefficient does not necessarily mean that distance is unimportant. The coefficient's magnitude depends on the feature's scale, and its effect may overlap with other features or involve nonlinear relationships.</p>
 
   <h3>(c) Polynomial regression using INDUS</h3>
   <p>The following figures show the fitted polynomial and the training and testing points for the degrees evaluated. The images are expected to be in the existing <code>fig</code> folder.</p>
@@ -66,31 +65,39 @@ The weight for DIS (weighted distance to five Boston employment centres) is very
     <img src="./fig/polynomial_regression_degree_7.png" alt="Degree 7 polynomial regression using INDUS">
     <figcaption>Degree 7.</figcaption>
   </figure>
-  <p class="comment"><strong>Comment:</strong> The fitted curve becomes more flexible as the polynomial degree increases. Higher-degree curves can fit the training points more closely, but may fluctuate more and generalize less reliably to unseen data.</p>
+  <p class="comment"><strong>Comment:</strong> The fitted curve becomes more flexible as the polynomial degree increases. Higher-degree curves can fit the training points more closely, but may fluctuate substantially and generalize less reliably to unseen data. This is consistent with the increasing testing errors observed at higher polynomial degrees.</p>
 
   <h3>(d) Selecting the regularization constant</h3>
   <figure>
     <img src="./fig/part1d_regularization_cv.png" alt="Cross-validation error versus regularization constant for polynomial regression">
     <figcaption>Average validation RMS from 10-fold cross-validation. The value for λ = 0 is displayed separately because zero cannot be placed on a logarithmic x-axis.</figcaption>
   </figure>
-  <p class="comment"><strong>Comment:</strong> The lowest average validation RMS was <strong>9.9839</strong>, at <strong>λ = 10</strong>. Therefore, λ = 10 is selected for the degree-8 polynomial model based on these cross-validation results. The very large unregularized error suggests the model is unstable without regularization.</p>
+  <p class="comment"><strong>Comment:</strong> The lowest average validation RMS was <strong>9.9839</strong>, at <strong>λ = 10</strong>. Therefore, λ = 10 is selected for the degree-8 polynomial model based on these cross-validation results. The unregularized model produced a much larger average validation RMS of 177529.8719. Regularization substantially reduces the validation error by controlling the magnitude of the polynomial coefficients and improving generalization.</p>
 
   <h2>Part 2: Gaussian Basis Function Regression</h2>
 
   <h3>(e) Training and testing RMS versus number of basis functions</h3>
   <figure>
     <img src="./fig/part2e_gaussian_errors.png" alt="Training and testing RMS versus number of Gaussian basis functions">
-    <figcaption>Training and testing RMS for 5, 15, 25, ..., 95 Gaussian basis functions.</figcaption>
+    <figcaption>Training and testing RMS for 5, 15, 25, ..., 95 Gaussian basis functions. The Gaussian width is σ = 4.6577, estimated from the average pairwise distance between normalized training samples. A constant bias term is included.</figcaption>
   </figure>
-  <p class="comment"><strong>Comment:</strong> Training RMS decreases from <strong>21.5121</strong> with 5 basis functions to <strong>3.2385</strong> with 95 basis functions. Testing RMS decreases only slightly, from <strong>24.4771</strong> to <strong>23.3589</strong>. Thus, adding basis functions improves the fit to the training data, while test performance improves only modestly.</p>
+  <p class="comment"><strong>Comment:</strong> Training RMS decreases consistently from <strong>3.5371</strong> with 5 basis functions to <strong>0.4234</strong> with 95 basis functions, indicating that increasing the number of basis functions allows the model to fit the training data more closely.</p>
+  <p class="comment">Testing RMS initially decreases from <strong>13.5540</strong> at K = 5 to <strong>7.8863</strong> at K = 25. The lowest observed testing RMS is <strong>7.9354</strong> at K = 35? </p>
+  <p class="comment">As K increases further, testing RMS fluctuates and eventually rises sharply, reaching 113.0822 at K = 85 and 217.4293 at K = 95. This indicates that adding more basis functions does not necessarily improve generalization. Although the training error continues to decrease, the model becomes increasingly sensitive to the training data, potentially due to overfitting and numerical ill-conditioning. Among the tested configurations, K = 25 provides the lowest testing RMS of <strong>7.8863</strong>.</p>
 
   <h3>(f) Selecting the regularization constant</h3>
   <figure>
     <img src="./fig/part2f_gaussian_regularization.png" alt="Cross-validation error versus regularization constant for Gaussian basis regression">
-    <figcaption>Average validation RMS for 90 Gaussian basis functions using 10-fold cross-validation. The λ = 0 value is annotated separately.</figcaption>
+    <figcaption>Average validation RMS for Gaussian basis regression using 10-fold cross-validation. The λ = 0 value is annotated separately.</figcaption>
   </figure>
-  <p class="comment"><strong>Comment:</strong> The lowest average validation RMS was <strong>10.7364</strong>, at <strong>λ = 0</strong>. Therefore, cross-validation selects the unregularized model for this configuration. In this experiment, increasing the regularization constant increased validation error.</p>
+  <p class="comment"><strong>Comment:</strong> The lowest average validation RMS was <strong>3.8081</strong>, at <strong>λ = 0.1</strong>. Therefore, cross-validation selects λ = 0.1 for the Gaussian basis regression model. The validation RMS decreases slightly from 3.9035 without regularization to 3.8081 at λ = 0.1. Larger regularization constants increase the validation error, suggesting that excessive penalization restricts the model too strongly. A small amount of regularization provides the best balance between fitting the training data and generalizing to unseen data among the tested values.</p>
 
   <p><a href="../index.html">Back to portfolio</a></p>
+
+  <h2>Source Code</h2>
+  <ul>
+    <li><a href="./part1.py" target="_blank">View part1.py</a></li>
+    <li><a href="./part2.py" target="_blank">View part2.py</a></li>
+  </ul>
 </body>
 </html>

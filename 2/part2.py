@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 with open("data.txt", "r") as f:
-    lines = f.readlines()[22:]
+    lines = f.readlines()
 
 numbers = np.fromstring(" ".join(lines), sep=" ")
 data = numbers.reshape(-1, 14)
@@ -11,30 +11,46 @@ data = numbers.reshape(-1, 14)
 X = data[:, :13]
 y = data[:, 13]
 
+
 def normalize_data(X_train, X_other):
     mean = X_train.mean(axis=0)
     std = X_train.std(axis=0)
-    std[std == 0] = 1
+    std[std == 0] = 1e-8
 
     return (X_train - mean) / std, (X_other - mean) / std
 
 
-def gaussian_basis(X, centers, sigma=1.0):
-    # Squared Euclidean distance from every sample to every center
+def gaussian_basis(X, centers, sigma):
     distances = np.sum(
         (X[:, None, :] - centers[None, :, :]) ** 2,
         axis=2
     )
-    return np.exp(-distances / (2 * sigma ** 2))
+
+    Phi = np.exp(-distances / (2 * sigma ** 2))
+
+    # Add bias term (constant column of ones)
+    return np.column_stack([np.ones(X.shape[0]), Phi])
 
 
-def gaussian_regression(X, y, sigma=1.0, seed=42):
+def gaussian_regression(X, y, seed=42):
     # First 100 samples for training; remaining samples for testing
     X_train_raw, y_train = X[:100], y[:100]
     X_test_raw, y_test = X[100:], y[100:]
 
+    # Normalize using training data only
     X_train, X_test = normalize_data(X_train_raw, X_test_raw)
 
+    # Calculate sigma as the average pairwise training-sample distance
+    distances = [
+        np.linalg.norm(X_train[i] - X_train[j])
+        for i in range(len(X_train))
+        for j in range(i + 1, len(X_train))
+    ]
+    sigma = np.mean(distances)
+
+    print(f"Gaussian width (sigma): {sigma:.4f}")
+
+    # Randomly select Gaussian centers
     rng = np.random.default_rng(seed)
     permutation = rng.permutation(len(X_train))
 
@@ -43,13 +59,12 @@ def gaussian_regression(X, y, sigma=1.0, seed=42):
     test_errors = []
 
     for K in basis_counts:
-        # Randomly select K training samples as Gaussian centers
         centers = X_train[permutation[:K]]
 
         Phi_train = gaussian_basis(X_train, centers, sigma)
         Phi_test = gaussian_basis(X_test, centers, sigma)
 
-        # No regularization
+        # Least-squares regression, including the bias term
         w = np.linalg.lstsq(Phi_train, y_train, rcond=None)[0]
 
         train_pred = Phi_train @ w
@@ -69,20 +84,26 @@ def gaussian_regression(X, y, sigma=1.0, seed=42):
     plt.figure(figsize=(8, 5))
     plt.plot(basis_counts, train_errors, "o-", label="Training RMS")
     plt.plot(basis_counts, test_errors, "s-", label="Testing RMS")
+    plt.yscale("log")
     plt.xlabel("Number of Gaussian basis functions")
     plt.ylabel("RMS error")
     plt.title("Gaussian Basis Regression")
     plt.xticks(basis_counts)
     plt.legend()
-    plt.grid(True)
+    plt.grid(True, which="both")
     plt.tight_layout()
-    plt.savefig("fig/part2e_gaussian_errors.png",
-                dpi=300, bbox_inches="tight")
+    plt.savefig(
+        "fig/part2e_gaussian_errors.png",
+        dpi=300,
+        bbox_inches="tight"
+    )
     plt.close()
 
     return basis_counts, train_errors, test_errors
 
+
 basis_counts, train_errors, test_errors = gaussian_regression(X, y)
+
 
 
 def gaussian_regression_reg(X, y, sigma=1.0, seed=42):

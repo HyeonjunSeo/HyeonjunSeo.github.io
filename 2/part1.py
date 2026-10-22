@@ -1,9 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 with open("data.txt", "r") as f:
-    lines = f.readlines()[22:]
+    lines = f.readlines()
 
 numbers = np.fromstring(" ".join(lines), sep=" ")
 data = numbers.reshape(-1, 14)
@@ -12,12 +11,18 @@ X = data[:, :13]
 y = data[:, 13]
 
 # Split: first 100 samples for training, remaining samples for testing
-X_train = X[:100]
+X_train_raw = X[:100]
 y_train = y[:100]
 
-X_test = X[100:]
+X_test_raw = X[100:]
 y_test = y[100:]
 
+mean_X = np.mean(X_train_raw, axis=0)
+std_X = np.std(X_train_raw, axis=0)
+std_X[std_X == 0] = 1e-8
+
+X_train = (X_train_raw - mean_X) / std_X
+X_test = (X_test_raw - mean_X) / std_X
 
 def make_basis(X, degree):
     Phi = [np.ones(X.shape[0])]
@@ -34,7 +39,7 @@ def polynomial_regression(X_train, y_train, X_test, degree):
 
     # Least-squares fitting, without regularization
     w = np.linalg.lstsq(Phi_train, y_train, rcond=None)[0]
-
+    
     # Predictions
     y_train_pred = Phi_train @ w
     y_test_pred = Phi_test @ w
@@ -54,10 +59,8 @@ for degree in degrees:
     train_rms, test_rms = polynomial_regression(
         X_train, y_train, X_test, degree
     )
-    print(degree)
     train_errors.append(train_rms)
     test_errors.append(test_rms)
-
     print(
         f"Degree {degree}: "
         f"Training RMS = {train_rms:.4f}, "
@@ -158,9 +161,7 @@ w7 = polynomial_regression_1d_vis(
 
 
 def polynomial_regression_reg(X, y, degree=8, feature_index=1,
-                              lambdas=None, n_folds=10):
-    if lambdas is None:
-        lambdas = [0, 0.01, 0.1, 1, 10, 100, 1000]
+                              lambdas=[0, 0.01, 0.1, 1, 10, 100, 1000], n_folds=10):
 
     # Use only the first 100 data points
     X = X[:100, feature_index]
@@ -281,5 +282,5 @@ def polynomial_regression_reg(X, y, degree=8, feature_index=1,
 
 
 best_lambda, lambdas, cv_errors = polynomial_regression_reg(
-    X_train, y_train
+    X_train_raw, y_train
 )
