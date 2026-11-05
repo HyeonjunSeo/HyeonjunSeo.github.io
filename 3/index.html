@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Iris Dataset — Dimensionality Reduction</title>
+  <style>
+    :root {
+      --ink: #202938;
+      --muted: #596579;
+      --accent: #285f8f;
+      --accent-light: #eaf2f8;
+      --line: #dce3eb;
+      --paper: #ffffff;
+      --background: #f3f6f9;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.65;
+    }
+    header {
+      background: #183b5b;
+      color: white;
+      padding: 56px 24px 48px;
+    }
+    .header-inner, main, footer { max-width: 1080px; margin: 0 auto; }
+    header h1 { margin: 0 0 10px; font-size: clamp(2rem, 5vw, 3rem); line-height: 1.15; }
+    header p { max-width: 760px; margin: 0; color: #e2edf6; font-size: 1.05rem; }
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: rgba(255,255,255,.96);
+      border-bottom: 1px solid var(--line);
+      backdrop-filter: blur(8px);
+    }
+    nav .nav-inner {
+      max-width: 1080px; margin: auto; padding: 10px 20px;
+      display: flex; flex-wrap: wrap; gap: 8px 20px;
+    }
+    nav a { color: var(--accent); text-decoration: none; font-size: .92rem; font-weight: 700; }
+    nav a:hover { text-decoration: underline; }
+    main { padding: 28px 20px 60px; }
+    section {
+      background: var(--paper);
+      margin: 0 0 24px;
+      padding: 30px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      box-shadow: 0 3px 12px rgba(20,40,60,.04);
+    }
+    h2 { margin: 0 0 16px; font-size: 1.7rem; color: #183b5b; }
+    h3 { margin: 28px 0 10px; font-size: 1.2rem; color: #274d6d; }
+    p { margin: 10px 0; }
+    .muted { color: var(--muted); }
+    .callout {
+      background: var(--accent-light);
+      border-left: 4px solid var(--accent);
+      padding: 14px 18px;
+      border-radius: 5px;
+      margin: 18px 0;
+    }
+    .figure-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 18px 0;
+    }
+    figure {
+      margin: 0;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      background: #fff;
+    }
+    figure img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 5px;
+    }
+    figcaption { color: var(--muted); font-size: .9rem; padding: 9px 2px 0; }
+    .missing {
+      min-height: 150px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 18px;
+      color: var(--muted);
+      background: #f6f8fa;
+      border: 1px dashed #aab6c4;
+      border-radius: 5px;
+      font-size: .9rem;
+    }
+    table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+    th, td { padding: 10px 12px; border: 1px solid var(--line); text-align: left; }
+    th { background: #edf3f8; }
+    code, pre { font-family: Consolas, "Courier New", monospace; }
+    code { background: #eef2f6; padding: 2px 5px; border-radius: 4px; }
+    pre {
+      overflow-x: auto;
+      background: #172330;
+      color: #edf4fa;
+      padding: 18px;
+      border-radius: 8px;
+      font-size: .88rem;
+      line-height: 1.55;
+    }
+    .source-list { display: grid; gap: 12px; margin-top: 18px; }
+    .source-item {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; padding: 15px 17px; border: 1px solid var(--line);
+      border-radius: 8px; background: #fbfcfd;
+    }
+    .source-item strong { display: block; }
+    .source-item span { color: var(--muted); font-size: .9rem; }
+    .source-item a {
+      flex: 0 0 auto; color: white; background: var(--accent);
+      padding: 8px 13px; border-radius: 6px; text-decoration: none; font-weight: 700;
+    }
+    .source-item a:hover { background: #1c496f; }
+    footer { color: var(--muted); padding: 0 20px 35px; font-size: .9rem; }
+    @media (max-width: 600px) {
+      section { padding: 21px 17px; }
+      .source-item { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="header-inner">
+      <h1>Iris Dataset: Feature Selection &amp; Dimensionality Reduction</h1>
+      <p>
+        An exploration of feature marginalization, Principal Component Analysis (PCA),
+        data compression, and nonlinear dimensionality reduction using Isomap.
+      </p>
+    </div>
+  </header>
+
+  <nav aria-label="Page navigation">
+    <div class="nav-inner">
+      <a href="#introduction">Introduction</a>
+      <a href="#part2">Part 2</a>
+      <a href="#part3">Part 3 — PCA</a>
+      <a href="#part4">Part 4 — Compression</a>
+      <a href="#part5">Part 5 — Isomap</a>
+      <a href="#source-code">Source Code</a>
+    </div>
+  </nav>
+
+  <main>
+    <section id="introduction">
+      <h2>Introduction</h2>
+      <p>
+        The Iris dataset contains 150 flower samples from three species:
+        <em>Iris setosa</em>, <em>Iris versicolor</em>, and <em>Iris virginica</em>.
+        Each sample is described by four measurements: sepal length, sepal width,
+        petal length, and petal width.
+      </p>
+      <p>
+        The goal of this analysis is to examine how the four-dimensional data can be
+        represented using fewer features while retaining useful information and
+        preserving the structure needed to distinguish the three species.
+      </p>
+      <div class="callout">
+        <strong>Dataset features:</strong> sepal length, sepal width, petal length,
+        and petal width. The target classes are the three Iris species.
+      </div>
+    </section>
+
+    <section id="part2">
+      <h2>Part 2 — Feature Selection and Marginalization</h2>
+      <p>
+        The data was visualized using one, two, and three features to examine how
+        different feature combinations reveal the distribution of the three species.
+        These plots show selected dimensions of the original feature space rather
+        than principal components.
+      </p>
+
+      <h3>One feature</h3>
+      <p>
+        The one-dimensional visualization shows the distribution of a single feature.
+        Petal length is useful because Iris setosa tends to occupy a distinct range,
+        while versicolor and virginica have more overlap.
+      </p>
+      <div class="figure-grid">
+        <figure>
+          <img src="fig/iris_1_feature.png" alt="One-dimensional Iris feature visualization"
+               onerror="this.outerHTML='<div class=&quot;missing&quot;>Figure not found: <code>fig/iris_1d.png</code><br>Update this filename if your Part 2 plot uses a different name.</div>'">
+          <figcaption>Figure 1. One-dimensional feature distribution.</figcaption>
+        </figure>
+      </div>
+
+      <h3>Two features</h3>
+      <p>
+        A two-feature scatter plot makes it possible to observe relationships between
+        measurements. Petal length and petal width are particularly informative:
+        setosa is clearly separated, while versicolor and virginica are closer and
+        partially overlap.
+      </p>
+      <div class="figure-grid">
+        <figure>
+          <img src="fig/iris_2_features.png" alt="Two-dimensional Iris feature visualization"
+               onerror="this.outerHTML='<div class=&quot;missing&quot;>Figure not found: <code>fig/iris_2d.png</code><br>Update this filename if your Part 2 plot uses a different name.</div>'">
+          <figcaption>Figure 2. Two-dimensional feature scatter plot.</figcaption>
+        </figure>
+      </div>
+
+      <h3>Three features</h3>
+      <p>
+        The three-dimensional plot adds another feature and provides a view of the
+        samples in a three-dimensional feature space. It can reveal structure that
+        is less apparent in a two-dimensional projection, although visual overlap
+        may remain between versicolor and virginica.
+      </p>
+      <div class="figure-grid">
+        <figure>
+          <img src="fig/iris_3_features.png" alt="Three-dimensional Iris feature visualization"
+               onerror="this.outerHTML='<div class=&quot;missing&quot;>Figure not found: <code>fig/iris_3d.png</code><br>Update this filename if your Part 2 plot uses a different name.</div>'">
+          <figcaption>Figure 3. Three-dimensional feature scatter plot.</figcaption>
+        </figure>
+      </div>
+
+      <h3>Observations</h3>
+      <ul>
+        <li>Petal measurements provide useful information for distinguishing the species.</li>
+        <li>Iris setosa is comparatively easy to distinguish from the other two species.</li>
+        <li>Iris versicolor and Iris virginica overlap more, so separating them is more difficult.</li>
+        <li>Adding dimensions can reveal additional structure, but does not guarantee perfect class separation.</li>
+      </ul>
+    </section>
+
+    <section id="part3">
+      <h2>Part 3 — Principal Component Analysis (PCA)</h2>
+      <p>
+        PCA is a linear dimensionality-reduction method. It finds orthogonal directions
+        (principal components) that successively capture the greatest possible
+        variance in the data. The four original features are transformed into four
+        principal-component coordinates.
+      </p>
+
+      <h3>Principal component vectors</h3>
+      <p>
+        Each principal component is a direction in the original four-feature space.
+        Its entries are the weights assigned to sepal length, sepal width, petal
+        length, and petal width, respectively.
+      </p>
+      <table>
+        <thead>
+          <tr><th>Component</th><th>Sepal length</th><th>Sepal width</th><th>Petal length</th><th>Petal width</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>PC1</td><td>0.36158968</td><td>-0.08226889</td><td>0.85657211</td><td>0.35884393</td></tr>
+          <tr><td>PC2</td><td>0.65653988</td><td>0.72971237</td><td>-0.17576740</td><td>-0.07470647</td></tr>
+          <tr><td>PC3</td><td>-0.58099728</td><td>0.59641809</td><td>0.07252408</td><td>0.54906091</td></tr>
+          <tr><td>PC4</td><td>0.31725455</td><td>-0.32409435</td><td>-0.47971899</td><td>0.75112056</td></tr>
+        </tbody>
+      </table>
+      <p class="muted">
+        The sign of an eigenvector can be reversed without changing the principal
+        component direction or the PCA result.
+      </p>
+
+      <h3>Explained variance</h3>
+      <table>
+        <thead><tr><th>Principal component</th><th>Explained variance</th><th>Cumulative variance</th></tr></thead>
+        <tbody>
+          <tr><td>PC1</td><td>92.46%</td><td>92.46%</td></tr>
+          <tr><td>PC2</td><td>5.30%</td><td>97.76%</td></tr>
+          <tr><td>PC3</td><td>1.72%</td><td>99.48%</td></tr>
+          <tr><td>PC4</td><td>0.52%</td><td>100.00%</td></tr>
+        </tbody>
+      </table>
+      <div class="callout">
+        The first two principal components retain <strong>97.76%</strong> of the
+        total variance. This means the four-dimensional dataset can be represented
+        in two dimensions while retaining most of its overall variation.
+      </div>
+
+      <h3>PCA visualizations</h3>
+      <div class="figure-grid">
+        <figure>
+          <img src="fig/iris_pca_1d.png" alt="Iris PCA one-dimensional plot"
+               onerror="this.outerHTML='<div class=&quot;missing&quot;>Figure not found: <code>fig/iris_pca_1d.png</code></div>'">
+          <figcaption>Figure 4. Iris dataset projected onto PC1.</figcaption>
+        </figure>
+        <figure>
+          <img src="fig/iris_pca_2d.png" alt="Iris PCA two-dimensional plot"
+               onerror="this.outerHTML='<div class=&quot;missing&quot;>Figure not found: <code>fig/iris_pca_2d.png</code></div>'">
+          <figcaption>Figure 5. Iris dataset projected onto PC1 and PC2.</figcaption>
+        </figure>
+        <figure>
+          <img src="fig/iris_pca_3d.png" alt="Iris PCA three-dimensional plot"
+               onerror="this.outerHTML='<div class=&quot;missing&quot;>Figure not found: <code>fig/iris_pca_3d.png</code></div>'">
+          <figcaption>Figure 6. Iris dataset projected onto the first three principal components.</figcaption>
+        </figure>
+        <figure>
+          <img src="fig/iris_pca_variance.png" alt="PCA explained variance plot"
+               onerror="this.outerHTML='<div class=&quot;missing&quot;>Figure not found: <code>fig/iris_pca_variance.png</code></div>'">
+          <figcaption>Figure 7. Explained variance by principal component.</figcaption>
+        </figure>
+        <figure>
+          <img src="fig/iris_pca_vectors.png" alt="PCA component vector plot"
+               onerror="this.outerHTML='<div class=&quot;missing&quot;>Figure not found: <code>fig/iris_pca_vectors.png</code></div>'">
+          <figcaption>Figure 8. Principal component vector coefficients.</figcaption>
+        </figure>
+      </div>
+
+      <h3>Observations</h3>
+      <ul>
+        <li>PC1 accounts for most of the variation (92.46%).</li>
+        <li>PC1 and PC2 together account for 97.76% of the variation.</li>
+        <li>The first two components provide a compact representation of the original four features.</li>
+        <li>In the two-dimensional plot, setosa is clearly separated, while versicolor and virginica show some overlap.</li>
+      </ul>
+    </section>
+
+    <section id="part4">
+      <h2>Part 4 — Data Compression</h2>
+      <p>
+        PCA can compress the dataset by retaining only the first few principal
+        components. The cumulative explained variance indicates how much of the
+        original data's total variance is retained after projection.
+      </p>
+      <table>
+        <thead><tr><th>Number of components</th><th>Cumulative variance retained</th><th>Variance lost</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>92.46%</td><td>7.54%</td></tr>
+          <tr><td>2</td><td>97.76%</td><td>2.24%</td></tr>
+          <tr><td>3</td><td>99.48%</td><td>0.52%</td></tr>
+          <tr><td>4</td><td>100.00%</td><td>0.00%</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Minimum number of components for 50% variance</h3>
+      <p>
+        Only <strong>one principal component</strong> is required because PC1 alone
+        explains 92.46% of the total variance, which exceeds the 50% threshold.
+      </p>
+
+      <h3>Connection to the Frobenius norm</h3>
+      <p>
+        For a centered data matrix \(X_c\), the squared Frobenius norm is the sum of
+        the squared entries:
+      </p>
+      <pre>||X_c||²_F = Σᵢ Σⱼ (X_c)ᵢⱼ²</pre>
+      <p>
+        This represents the total squared variation in the centered dataset. It is
+        equal to the sum of the eigenvalues of the unnormalized scatter matrix
+        \(X_c^T X_c\). If the sample covariance matrix
+        \(X_c^T X_c/(n-1)\) is used instead, the Frobenius norm squared equals
+        \((n-1)\) times the sum of its eigenvalues.
+      </p>
+      <p>
+        Therefore, the fraction of variance retained by the first \(k\) components
+        is the sum of their eigenvalues divided by the sum of all eigenvalues.
+      </p>
+    </section>
+
+    <section id="part5">
+      <h2>Part 5 — Isomap</h2>
+      <p>
+        Isomap is a nonlinear dimensionality-reduction method. It first constructs
+        a neighbourhood graph using the nearest neighbours of each sample, estimates
+        distances along the graph using shortest paths, and then embeds the data
+        into a lower-dimensional space while attempting to preserve those
+        geodesic distances.
+      </p>
+      <p>
+        The Iris dataset was embedded into two dimensions using
+        <strong>3 nearest neighbours</strong>.
+      </p>
+
+      <div class="figure-grid">
+        <figure>
+          <img src="fig/iris_isomap_2d.png" alt="Iris Isomap two-dimensional plot"
+               onerror="this.outerHTML='<div class=&quot;missing&quot;>Figure not found: <code>fig/iris_isomap_2d.png</code></div>'">
+          <figcaption>Figure 9. Two-dimensional Isomap embedding (3 nearest neighbours).</figcaption>
+        </figure>
+      </div>
+
+      <h3>Reconstruction error</h3>
+      <p>
+        The Isomap reconstruction error reported by the implementation was:
+      </p>
+      <pre>0.4363607297646883</pre>
+      <p>
+        This error describes distortion in the embedding's representation of the
+        geodesic-distance structure. It is not an explained-variance percentage and
+        should not be directly compared with PCA's 97.76% explained variance.
+      </p>
+
+      <h3>Comparison with PCA</h3>
+      <table>
+        <thead><tr><th>Criterion</th><th>PCA</th><th>Isomap</th></tr></thead>
+        <tbody>
+          <tr><td>Type</td><td>Linear</td><td>Nonlinear</td></tr>
+          <tr><td>Objective</td><td>Maximize retained variance</td><td>Preserve approximate geodesic distances</td></tr>
+          <tr><td>Two-dimensional result</td><td>Better visual class separation in this analysis</td><td>Greater overlap between versicolor and virginica</td></tr>
+          <tr><td>Compression measure</td><td>97.76% variance retained</td><td>Reconstruction error: 0.43636</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Observations and conclusion</h3>
+      <p>
+        In the resulting Isomap visualization, Iris setosa remains comparatively
+        distinct, but Iris versicolor and Iris virginica overlap more than they do
+        in the PCA visualization. Although Isomap can represent nonlinear
+        relationships by preserving geodesic distances, this did not improve
+        class separation for the Iris dataset in this two-dimensional embedding.
+      </p>
+      <p>
+        Based on the observed plots, PCA is the more suitable representation for
+        this dataset when the goal is compact dimensionality reduction and visual
+        distinction between the three species. This result also illustrates that
+        a nonlinear dimensionality-reduction method does not necessarily produce
+        better class separation than a linear method.
+      </p>
+    </section>
+
+    <section id="source-code">
+      <h2>Python Source Code</h2>
+      <p>
+        The complete Python scripts used to generate the results are provided below.
+        Select a file to open or download its source code.
+      </p>
+      <div class="source-list">
+        <div class="source-item">
+          <div><strong>part2.py</strong><span>Feature selection and marginalization visualizations</span></div>
+          <a href="part2.py" download>View / Download</a>
+        </div>
+        <div class="source-item">
+          <div><strong>part3.py</strong><span>Principal Component Analysis and PCA visualizations</span></div>
+          <a href="part3.py" download>View / Download</a>
+        </div>
+        <div class="source-item">
+          <div><strong>part5.py</strong><span>Isomap dimensionality reduction and visualization</span></div>
+          <a href="part5.py" download>View / Download</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Iris dataset dimensionality-reduction report.</p>
+  </footer>
+</body>
+</html>
