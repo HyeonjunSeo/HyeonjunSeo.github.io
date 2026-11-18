@@ -1,0 +1,310 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Naive Bayes Classification Results</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 1000px;
+        margin: 40px auto;
+        padding: 0 20px;
+        line-height: 1.6;
+        color: #333;
+        background: #f8f9fa;
+    }
+
+    h1, h2 {
+        color: #243b53;
+    }
+
+    h1 {
+        border-bottom: 3px solid #486581;
+        padding-bottom: 12px;
+    }
+
+    section {
+        background: white;
+        padding: 22px;
+        margin: 22px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .metric-container {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+    }
+
+    .metric {
+        flex: 1;
+        min-width: 150px;
+        background: #edf2f7;
+        padding: 18px;
+        border-radius: 6px;
+        text-align: center;
+    }
+
+    .metric strong {
+        display: block;
+        font-size: 26px;
+        color: #243b53;
+    }
+
+    .review {
+        border-left: 4px solid #829ab1;
+        padding: 12px 16px;
+        margin: 15px 0;
+        background: #f7fafc;
+        border-radius: 4px;
+    }
+
+    .review p {
+        margin: 5px 0;
+    }
+
+    .pos {
+        color: #287d4f;
+        font-weight: bold;
+    }
+
+    .neg {
+        color: #c0392b;
+        font-weight: bold;
+    }
+
+    .score {
+        color: #52606d;
+        font-size: 14px;
+    }
+
+    .sanity {
+        border-bottom: 1px solid #ddd;
+        padding: 12px 0;
+    }
+
+    .sanity:last-child {
+        border-bottom: none;
+    }
+
+    .conclusion {
+        background: #edf2f7;
+        padding: 18px;
+        border-radius: 6px;
+    }
+
+    code {
+        overflow-wrap: anywhere;
+    }
+</style>
+</head>
+
+<body>
+
+<h1>Naive Bayes Text Classification</h1>
+
+<section>
+    <h2>1. Model Evaluation</h2>
+
+    <div class="metric-container">
+        <div class="metric">
+            <strong>81.54%</strong>
+            Accuracy
+        </div>
+        <div class="metric">
+            <strong>1,943</strong>
+            Correct predictions
+        </div>
+        <div class="metric">
+            <strong>440</strong>
+            Misclassified reviews
+        </div>
+    </div>
+
+    <p>
+        The Naive Bayes classifier achieved an accuracy of
+        <strong>81.54%</strong> on the test dataset.
+        Out of 2,383 reviews, 1,943 were classified correctly
+        and 440 were misclassified.
+    </p>
+</section>
+
+<section>
+    <h2>2. Sanity Checks</h2>
+
+    <div class="sanity">
+        <h3>Input: "great"</h3>
+        <p>Positive score: <code>-6.6292</code></p>
+        <p>Negative score: <code>-7.5457</code></p>
+        <p>Positive probability: <code>0.001321</code></p>
+        <p>Negative probability: <code>0.000528</code></p>
+        <p>Prediction: <span class="pos">Positive</span></p>
+    </div>
+
+    <div class="sanity">
+        <h3>Input: "bad"</h3>
+        <p>Positive score: <code>-8.6663</code></p>
+        <p>Negative score: <code>-7.6958</code></p>
+        <p>Positive probability: <code>0.000172</code></p>
+        <p>Negative probability: <code>0.000455</code></p>
+        <p>Prediction: <span class="neg">Negative</span></p>
+    </div>
+
+    <div class="sanity">
+        <h3>Input: "a top-quality performance"</h3>
+        <p>Positive score: <code>-26.3663</code></p>
+        <p>Negative score: <code>-27.0375</code></p>
+        <p>Positive probability: <code>3.5422 × 10⁻¹²</code></p>
+        <p>Negative probability: <code>1.8103 × 10⁻¹²</code></p>
+        <p>Prediction: <span class="pos">Positive</span></p>
+    </div>
+
+    <p>
+        The model correctly identifies the expected sentiment
+        for all three test inputs.
+    </p>
+</section>
+
+<section>
+    <h2>3. Error Analysis</h2>
+
+    <p>
+        The following are 10 short examples selected from the
+        440 misclassified reviews.
+    </p>
+
+    <div class="review">
+        <h3>Review 1</h3>
+        <p><strong>Text:</strong> "goo"</p>
+        <p>True label: <span class="pos">Positive</span></p>
+        <p>Predicted label: <span class="neg">Negative</span></p>
+        <p class="score">Positive score: -13.5415</p>
+        <p class="score">Negative score: -12.8747</p>
+        <p><strong>Possible reason:</strong> The review is extremely short and provides almost no contextual information.</p>
+    </div>
+
+    <div class="review">
+        <h3>Review 2</h3>
+        <p><strong>Text:</strong> "it 's not great music to dance to"</p>
+        <p>True label: <span class="neg">Negative</span></p>
+        <p>Predicted label: <span class="pos">Positive</span></p>
+        <p class="score">Positive score: -45.3201</p>
+        <p class="score">Negative score: -46.2597</p>
+        <p><strong>Possible reason:</strong> The word "great" may contribute positive sentiment, while the model may not adequately capture the negation and context.</p>
+    </div>
+
+    <div class="review">
+        <h3>Review 3</h3>
+        <p><strong>Text:</strong> "i would have liked a more real story in this dvd"</p>
+        <p>True label: <span class="neg">Negative</span></p>
+        <p>Predicted label: <span class="pos">Positive</span></p>
+        <p class="score">Positive score: -66.2573</p>
+        <p class="score">Negative score: -66.3436</p>
+        <p><strong>Possible reason:</strong> The model may struggle to interpret dissatisfaction expressed indirectly rather than through strongly negative words.</p>
+    </div>
+
+    <div class="review">
+        <h3>Review 4</h3>
+        <p><strong>Text:</strong> "you will never look at these birds the same again - fansinating"</p>
+        <p>True label: <span class="pos">Positive</span></p>
+        <p>Predicted label: <span class="neg">Negative</span></p>
+        <p class="score">Positive score: -88.2266</p>
+        <p class="score">Negative score: -87.6615</p>
+        <p><strong>Possible reason:</strong> The unusual spelling of "fascinating" may prevent the model from recognizing the positive sentiment.</p>
+    </div>
+
+    <div class="review">
+        <h3>Review 5</h3>
+        <p><strong>Text:</strong> "this lifts your heart to god as you listen . beautifully done"</p>
+        <p>True label: <span class="neg">Negative</span></p>
+        <p>Predicted label: <span class="pos">Positive</span></p>
+        <p class="score">Positive score: -85.4594</p>
+        <p class="score">Negative score: -88.3084</p>
+        <p><strong>Possible reason:</strong> Strong positive expressions such as "beautifully done" may dominate the prediction.</p>
+    </div>
+
+    <div class="review">
+        <h3>Review 6</h3>
+        <p><strong>Text:</strong> "works fine . like several other office packages lacks database program , access"</p>
+        <p>True label: <span class="pos">Positive</span></p>
+        <p>Predicted label: <span class="neg">Negative</span></p>
+        <p class="score">Positive score: -101.7685</p>
+        <p class="score">Negative score: -100.8638</p>
+        <p><strong>Possible reason:</strong> The negative phrase about the missing database program may outweigh the positive statement "works fine."</p>
+    </div>
+
+    <div class="review">
+        <h3>Review 7</h3>
+        <p><strong>Text:</strong> "seem 's to work very well cost was acceptable not a resource ho"</p>
+        <p>True label: <span class="pos">Positive</span></p>
+        <p>Predicted label: <span class="neg">Negative</span></p>
+        <p class="score">Positive score: -94.1969</p>
+        <p class="score">Negative score: -92.6766</p>
+        <p><strong>Possible reason:</strong> The review contains mixed expressions, and the incomplete final phrase may make interpretation difficult.</p>
+    </div>
+
+    <div class="review">
+        <h3>Review 8</h3>
+        <p><strong>Text:</strong> "not particularly musical ; only 1 good track ( blues for miles ) .."</p>
+        <p>True label: <span class="neg">Negative</span></p>
+        <p>Predicted label: <span class="pos">Positive</span></p>
+        <p class="score">Positive score: -105.8089</p>
+        <p class="score">Negative score: -106.9221</p>
+        <p><strong>Possible reason:</strong> The positive word "good" may influence the prediction despite the overall negative evaluation.</p>
+    </div>
+
+    <div class="review">
+        <h3>Review 9</h3>
+        <p><strong>Text:</strong> "a vitamin is a vitamin but when you pay half price then you have something"</p>
+        <p>True label: <span class="pos">Positive</span></p>
+        <p>Predicted label: <span class="neg">Negative</span></p>
+        <p class="score">Positive score: -102.9878</p>
+        <p class="score">Negative score: -102.4499</p>
+        <p><strong>Possible reason:</strong> The positive sentiment depends on the context of receiving a good price, which may not be captured by individual words.</p>
+    </div>
+
+    <div class="review">
+        <h3>Review 10</h3>
+        <p><strong>Text:</strong> "the cd came as promised and in the condition promised . i 'm very satisfied"</p>
+        <p>True label: <span class="neg">Negative</span></p>
+        <p>Predicted label: <span class="pos">Positive</span></p>
+        <p class="score">Positive score: -96.2733</p>
+        <p class="score">Negative score: -98.1065</p>
+        <p><strong>Possible reason:</strong> The phrase "very satisfied" strongly suggests positive sentiment, making this prediction understandable even though it disagrees with the provided label.</p>
+    </div>
+</section>
+
+<section>
+    <h2>4. Conclusion</h2>
+
+    <div class="conclusion">
+        <p>
+            The Naive Bayes classifier achieved an accuracy of
+            <strong>81.54%</strong>, showing that it can classify
+            most reviews correctly.
+        </p>
+
+        <p>
+            The error analysis reveals several limitations:
+        </p>
+
+        <ul>
+            <li>Very short reviews provide insufficient information.</li>
+            <li>Negation and sentence context are difficult to interpret.</li>
+            <li>Mixed positive and negative expressions can cause confusion.</li>
+            <li>Spelling errors and unusual vocabulary can affect word-based predictions.</li>
+        </ul>
+
+        <p>
+            These errors highlight a limitation of Naive Bayes:
+            it treats words largely independently and does not
+            fully understand the context or meaning of a sentence.
+        </p>
+    </div>
+</section>
+
+</body>
+</html>
